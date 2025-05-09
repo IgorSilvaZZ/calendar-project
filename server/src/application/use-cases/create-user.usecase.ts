@@ -1,14 +1,18 @@
-import { hash } from "bcryptjs";
-
 import { CreateUserDTO } from "../dtos/create-user.dto";
 
 import { User } from "@domains/user/user.entity";
 import { UserRepository } from "@domains/user/user.repository";
 
-import { createUserSchema } from "src/shared/validators/user.schema";
+import { HashRepository } from "@shared/repositories/hash.repository";
+import { BcryptJsRepository } from "@shared/repositories/bcryptjs.repository";
+
+import { createUserSchema } from "@validators/user.schema";
 
 export class CreateUserUseCase {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private userRepository: UserRepository,
+    private hashPassword: HashRepository = new BcryptJsRepository()
+  ) {}
 
   async execute({ name, email, password, dateBirth }: CreateUserDTO) {
     const resultCreateUserSchema = createUserSchema.safeParse({
@@ -28,14 +32,18 @@ export class CreateUserUseCase {
       throw new Error("User already exists!");
     }
 
-    const passwordHashed = await hash(password, 10);
+    const passwordHashed = await this.hashPassword.hash(password);
 
-    const user = new User({
+    const user = User.create({
       name,
       email,
       password: passwordHashed,
       dateBirth,
       createdAt: new Date(),
     });
+
+    await this.userRepository.create(user);
+
+    return user;
   }
 }

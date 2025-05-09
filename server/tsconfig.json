@@ -5,7 +5,11 @@
     "baseUrl": ".",
     "paths": {
       "@domains/*": ["src/domains/*"],
-      "@errors/*": ["src/shared/errors/*"]
+      "@shared/*": ["src/shared/*"],
+      "@dtos/*": ["src/application/dtos/*"],
+      "@errors/*": ["src/shared/errors/*"],
+      "@validators/*": ["src/shared/validators/*"],
+      "@test/*": ["src/test/*"]
     },
     "allowJs": true,
     "outDir": "./dist",
